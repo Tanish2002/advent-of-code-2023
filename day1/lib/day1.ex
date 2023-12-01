@@ -5,12 +5,10 @@ defmodule Day1 do
         contents
         |> String.replace(~r/[^\d\n]/, "")
         |> String.split("\n", trim: true)
-        |> Enum.map(fn str ->
+        |> Enum.reduce(0, fn str, acc ->
           num = String.first(str) <> String.last(str)
-          {val, _} = Integer.parse(num)
-          val
+          String.to_integer(num) + acc
         end)
-        |> Enum.sum()
         |> IO.inspect()
 
       {:error, reason} ->
