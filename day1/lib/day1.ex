@@ -37,13 +37,11 @@ defmodule Day1 do
               _ -> val
             end
           end)
+          |> Enum.join()
+          |> then(fn str -> String.first(str) <> String.last(str) end)
+          |> String.to_integer()
         end)
-        |> Enum.reduce(0, fn arr, acc ->
-          first = Enum.at(arr, 0)
-          last = Enum.at(arr, -1)
-          num = first <> last
-          String.to_integer(num) + acc
-        end)
+        |> Enum.sum()
         |> IO.inspect()
 
       {:error, reason} ->
