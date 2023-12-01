@@ -20,28 +20,28 @@ defmodule Day1 do
     case File.read("./input.txt") do
       {:ok, contents} ->
         contents
-        |> String.split("\n", trim: true)
-        |> Enum.map(fn str ->
-          Regex.scan(~r/one|two|three|four|five|six|seven|eight|nine|\d/, str)
-          |> Enum.map(fn [val] ->
-            case val do
-              "one" -> "1"
-              "two" -> "2"
-              "three" -> "3"
-              "four" -> "4"
-              "five" -> "5"
-              "six" -> "6"
-              "seven" -> "7"
-              "eight" -> "8"
-              "nine" -> "9"
-              _ -> val
-            end
-          end)
-          |> Enum.join()
-          |> then(fn str -> String.first(str) <> String.last(str) end)
-          |> String.to_integer()
+        |> then(fn input ->
+          Regex.scan(~r/one|two|three|four|five|six|seven|eight|nine|[\d\n]/, input)
         end)
-        |> Enum.sum()
+        |> Enum.map(fn [val] ->
+          case val do
+            "one" -> "1"
+            "two" -> "2"
+            "three" -> "3"
+            "four" -> "4"
+            "five" -> "5"
+            "six" -> "6"
+            "seven" -> "7"
+            "eight" -> "8"
+            "nine" -> "9"
+            _ -> val
+          end
+        end)
+        |> Enum.join()
+        |> String.split("\n", trim: true)
+        |> Enum.reduce(0, fn str, acc ->
+          String.to_integer(String.first(str) <> String.last(str)) + acc
+        end)
         |> IO.inspect()
 
       {:error, reason} ->
