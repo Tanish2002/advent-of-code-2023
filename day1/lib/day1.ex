@@ -22,30 +22,30 @@ defmodule Day1 do
     case File.read("./input.txt") do
       {:ok, contents} ->
         contents
-        # Niche replacements
-        |> String.replace(~r/eighthree/, "83")
-        |> String.replace(~r/eightwo/, "82")
-        |> String.replace(~r/sevenine/, "79")
-        |> String.replace(~r/twone/, "21")
-        |> String.replace(~r/oneight/, "18")
-        # Simple replacements
-        |> String.replace(~r/one/, "1")
-        |> String.replace(~r/two/, "2")
-        |> String.replace(~r/three/, "3")
-        |> String.replace(~r/four/, "4")
-        |> String.replace(~r/five/, "5")
-        |> String.replace(~r/six/, "6")
-        |> String.replace(~r/seven/, "7")
-        |> String.replace(~r/eight/, "8")
-        |> String.replace(~r/nine/, "9")
-        |> String.replace(~r/[^\d\n]/, "")
         |> String.split("\n", trim: true)
         |> Enum.map(fn str ->
-          num = String.first(str) <> String.last(str)
-          {val, _} = Integer.parse(num)
-          val
+          Regex.scan(~r/one|two|three|four|five|six|seven|eight|nine|\d/, str)
+          |> Enum.map(fn [val] ->
+            case val do
+              "one" -> "1"
+              "two" -> "2"
+              "three" -> "3"
+              "four" -> "4"
+              "five" -> "5"
+              "six" -> "6"
+              "seven" -> "7"
+              "eight" -> "8"
+              "nine" -> "9"
+              _ -> val
+            end
+          end)
         end)
-        |> Enum.sum()
+        |> Enum.reduce(0, fn arr, acc ->
+          first = Enum.at(arr, 0)
+          last = Enum.at(arr, -1)
+          num = first <> last
+          String.to_integer(num) + acc
+        end)
         |> IO.inspect()
 
       {:error, reason} ->
