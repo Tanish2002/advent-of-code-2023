@@ -4,45 +4,13 @@ defmodule Day2 do
       {:ok, contents} ->
         contents
         |> String.split(["\n"], trim: true)
-        |> Enum.map(fn str ->
-          Regex.scan(~r/(\d+) (red|blue|green)/, str)
-          |> Enum.group_by(fn [_, _num, color] -> color end)
-        end)
-        |> Enum.map(fn color_map ->
-          Enum.reduce(color_map, true, fn {color, value_list}, acc ->
-            acc and
-              Enum.reduce(value_list, true, fn [_, num, _], acc ->
-                case color do
-                  "red" ->
-                    if String.to_integer(num) > 12 do
-                      false and acc
-                    else
-                      true and acc
-                    end
+        |> Enum.reduce(0, fn str, acc ->
+          [game_id, red, blue, green] = game_Parser(str)
 
-                  "blue" ->
-                    if String.to_integer(num) > 14 do
-                      false and acc
-                    else
-                      true and acc
-                    end
-
-                  "green" ->
-                    if String.to_integer(num) > 13 do
-                      false and acc
-                    else
-                      true and acc
-                    end
-                end
-              end)
-          end)
-        end)
-        |> Enum.with_index()
-        |> Enum.reduce(0, fn {boolean, index}, acc ->
-          if boolean do
-            acc + index + 1
-          else
+          if red > 12 || green > 13 || blue > 14 do
             acc
+          else
+            game_id + acc
           end
         end)
         |> IO.inspect()
@@ -57,22 +25,38 @@ defmodule Day2 do
       {:ok, contents} ->
         contents
         |> String.split(["\n"], trim: true)
-        |> Enum.map(fn str ->
-          Regex.scan(~r/(\d+) (red|blue|green)/, str)
-          |> Enum.group_by(fn [_, _num, color] -> color end)
+        |> Enum.reduce(0, fn str, acc ->
+          [_, red, blue, green] = game_Parser(str)
+          product = red * blue * green
+          product + acc
         end)
-        |> Enum.map(fn color_map ->
-          Enum.reduce(color_map, 1, fn {_color, value_list}, acc ->
-            numbers = Enum.map(value_list, fn [_, num, _color] -> String.to_integer(num) end)
-            max_number = Enum.max(numbers)
-            acc * max_number
-          end)
-        end)
-        |> Enum.sum()
         |> IO.inspect()
 
       {:error, reason} ->
         IO.puts("Error reading file: #{reason}")
     end
+  end
+
+  defp game_Parser(game) do
+    [[_, game_id]] = Regex.scan(~r/Game (\d+)/, game)
+
+    [_, max_red] =
+      Regex.scan(~r/(\d+) red/, game)
+      |> Enum.max_by(fn [_, num] -> String.to_integer(num) end)
+
+    [_, max_blue] =
+      Regex.scan(~r/(\d+) green/, game)
+      |> Enum.max_by(fn [_, num] -> String.to_integer(num) end)
+
+    [_, max_green] =
+      Regex.scan(~r/(\d+) blue/, game)
+      |> Enum.max_by(fn [_, num] -> String.to_integer(num) end)
+
+    [
+      String.to_integer(game_id),
+      String.to_integer(max_red),
+      String.to_integer(max_blue),
+      String.to_integer(max_green)
+    ]
   end
 end
